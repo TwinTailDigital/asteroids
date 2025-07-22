@@ -7,6 +7,8 @@ class Player(CircleShape):
     def __init__(self,x,y):
         super().__init__(x,y,PLAYER_RADIUS)
         self.shot_timer = 0.0
+        self.muzzle_flash_timer = 0.0
+        self.muzzle_flash_direction = []
         self.image = pygame.Surface((self.radius * 2, self.radius * 2))
         self.image.set_colorkey((0, 0, 0))  # Make black transparent
         self.rect = self.image.get_rect(center=(x, y))
@@ -21,6 +23,11 @@ class Player(CircleShape):
 
     def draw(self, screen):
         pygame.draw.polygon(screen,"white",self.triangle(),2)
+        if self.muzzle_flash_timer > 0.0:
+            for flash_angle in self.muzzle_flash_direction:
+                direction = pygame.Vector2(0,1).rotate(flash_angle)
+                flash_end = self.triangle()[0] + direction * 16
+                pygame.draw.line(screen,"white",self.triangle()[0],flash_end,1)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -42,12 +49,16 @@ class Player(CircleShape):
                 self.shot_timer = SHOT_RATE
         
         self.rect.center = self.position
+        self.muzzle_flash_direction = [self.rotation - 45,self.rotation - 30,self.rotation + 30, self.rotation + 45]
         self.shot_timer -= dt
+        self.muzzle_flash_timer -= dt
     
     def move(self, dt):
         forward = pygame.Vector2(0,1).rotate(self.rotation)
         self.position += forward * PLAYER_SPEED * dt
     
     def shoot(self):
-        shot = Shot(self.position.x,self.position.y)
+        spawn_point = self.triangle()[0]
+        shot = Shot(spawn_point.x,spawn_point.y)
         shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * SHOT_SPEED
+        self.muzzle_flash_timer = 0.1
