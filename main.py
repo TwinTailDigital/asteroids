@@ -10,9 +10,11 @@ def main():
     group_updateable = pygame.sprite.Group()
     group_drawable = pygame.sprite.Group()
     group_asteroids = pygame.sprite.Group()
+    group_shots = pygame.sprite.Group()
     Asteroid.containers = (group_asteroids,group_updateable,group_drawable)
     AsteroidField.containers = (group_updateable)
     Player.containers = (group_updateable,group_drawable)
+    Shot.containers = (group_shots,group_updateable,group_drawable)
     asteroid_field = AsteroidField()
     game_clock = pygame.time.Clock()
     dt = 0

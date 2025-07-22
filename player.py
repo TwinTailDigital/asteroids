@@ -1,12 +1,13 @@
 import pygame
 from circleshape import *
 from constants import *
+from shot import *
 
 class Player(CircleShape):
     def __init__(self,x,y):
         super().__init__(x,y,PLAYER_RADIUS)
         self.rotation = 0
-
+        self.shot_timer = 0.0
         self.image = pygame.Surface((self.radius * 2, self.radius * 2))
         self.image.set_colorkey((0, 0, 0))  # Make black transparent
         self.rect = self.image.get_rect(center=(x, y))
@@ -36,9 +37,18 @@ class Player(CircleShape):
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(dt * -1)
+        if keys[pygame.K_SPACE]:
+            if not self.shot_timer > 0.0:
+                self.shoot()
+                self.shot_timer = SHOT_RATE
         
         self.rect.center = self.position
+        self.shot_timer -= dt
     
     def move(self, dt):
         forward = pygame.Vector2(0,1).rotate(self.rotation)
         self.position += forward * PLAYER_SPEED * dt
+    
+    def shoot(self):
+        shot = Shot(self.position.x,self.position.y)
+        shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * SHOT_SPEED
