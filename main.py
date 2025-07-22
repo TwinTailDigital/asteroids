@@ -1,5 +1,5 @@
 import pygame
-import sys
+import math
 from constants import *
 from player import *
 from asteroid import Asteroid
@@ -7,6 +7,7 @@ from asteroidfield import AsteroidField
 
 def main():
     pygame.init()
+    pygame.font.init()
     group_updateable = pygame.sprite.Group()
     group_drawable = pygame.sprite.Group()
     group_asteroids = pygame.sprite.Group()
@@ -19,6 +20,7 @@ def main():
     game_clock = pygame.time.Clock()
     dt = 0
     screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+    font = pygame.font.Font(None,32)
     player = Player(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2)
     print("Starting Asteroids!")
     run = True
@@ -30,12 +32,14 @@ def main():
         group_updateable.update(dt)
         for asteroid in group_asteroids:
             if asteroid.collision_check(player):
-                print(f"Game over!")
-                sys.exit()
+                if player.shield_timer <= 0:
+                    player.die()
             for bullet in group_shots:
                 if asteroid.collision_check(bullet):
                     bullet.kill()
-                    asteroid.split()
+                    points = asteroid.split()
+                    distance = math.floor(player.position.distance_to(asteroid.position))
+                    player.add_score(points + max(0, MAX_BONUS - distance))
         for item in group_drawable:
             item.draw(screen)
         pygame.display.flip()
