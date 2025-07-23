@@ -51,20 +51,24 @@ class Player(CircleShape):
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
+        forward = pygame.Vector2(0,1).rotate(self.rotation)
 
         if keys[pygame.K_a]:
             self.rotate(dt * -1)
         if keys[pygame.K_d]:
             self.rotate(dt)
         if keys[pygame.K_w]:
-            self.move(dt)
+            self.velocity += forward * PLAYER_ACCELERATION * dt
         if keys[pygame.K_s]:
-            self.move(dt * -1)
+            self.velocity -= forward * PLAYER_ACCELERATION * dt
         if keys[pygame.K_SPACE]:
             if not self.shot_timer > 0.0:
                 self.shoot()
                 self.shot_timer = SHOT_RATE
         
+        self.position += self.velocity * dt
+        self.velocity *= (1 - PLAYER_DRAG * dt)
+
         if self.position.x > (SCREEN_WIDTH):
             self.position.x = 0
         elif self.position.x < 0:
@@ -81,10 +85,6 @@ class Player(CircleShape):
         self.shot_timer -= dt
         self.muzzle_flash_timer -= dt
         self.timer += dt
-    
-    def move(self, dt):
-        forward = pygame.Vector2(0,1).rotate(self.rotation)
-        self.position += forward * PLAYER_SPEED * dt
     
     def shoot(self):
         spawn_point = self.triangle()[0]
