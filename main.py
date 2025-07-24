@@ -4,6 +4,7 @@ from constants import *
 from player import *
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
+from fragment import *
 
 def main():
     pygame.init()
@@ -16,6 +17,7 @@ def main():
     AsteroidField.containers = (group_updateable)
     Player.containers = (group_updateable,group_drawable)
     Shot.containers = (group_shots,group_updateable,group_drawable)
+    Fragment.containers = (group_updateable,group_drawable)
     asteroid_field = AsteroidField()
     game_clock = pygame.time.Clock()
     dt = 0

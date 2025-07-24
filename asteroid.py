@@ -3,6 +3,7 @@ import random
 import math
 from circleshape import *
 from constants import *
+from fragment import *
 
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius, num_points, jaggeyness,spin_speed):
@@ -42,6 +43,14 @@ class Asteroid(CircleShape):
     def split(self):
         self.kill()
         kind = int(self.radius // ASTEROID_MIN_RADIUS)
+
+        num_fragments = random.randint(8,16) * kind
+        for _ in range(num_fragments):
+            direction = pygame.Vector2(1,0).rotate(self.velocity.as_polar()[1] + random.uniform(-45,45))
+            life = random.uniform(0.1,0.5)
+            spawn_position = self.position + direction * self.radius
+            Fragment(spawn_position,direction,self.velocity.magnitude() * kind,life)
+
         if kind == 1:
             return math.floor(self.velocity.length())
         else:
