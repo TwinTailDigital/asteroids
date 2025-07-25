@@ -4,6 +4,7 @@ import math
 from circleshape import *
 from constants import *
 from fragment import *
+from powerup import *
 
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius, num_points, jaggeyness,spin_speed):
@@ -43,28 +44,30 @@ class Asteroid(CircleShape):
     def split(self):
         self.kill()
         kind = int(self.radius // ASTEROID_MIN_RADIUS)
-
+        points = math.floor(self.velocity.length() / kind)
         num_fragments = random.randint(8,16) * kind
         for _ in range(num_fragments):
             direction = pygame.Vector2(1,0).rotate(self.velocity.as_polar()[1] + random.uniform(-45,45))
             life = random.uniform(0.1,0.5)
             spawn_position = self.position + direction * self.radius
-            Fragment(spawn_position,direction,self.velocity.magnitude() * kind,life)
+            Fragment(spawn_position,direction,(self.velocity.magnitude() * kind) * random.uniform(0.8,1.2),life)
 
         if kind == 1:
-            return math.floor(self.velocity.length())
+            if points >= 100 and random.uniform(0.0,1.0) >= 0.75:
+                PowerUp(self.position,pygame.Vector2(1,0).rotate(self.velocity.as_polar()[1] + random.uniform(-45,45)),self.velocity)
+            return points
         else:
-            num_points = 0
+            asteroid_detail_level = 0
             match(kind):
                 case 3: 
-                    num_points = int(random.uniform(20,24))
+                    asteroid_detail_level = int(random.uniform(20,24))
                 case 2: 
-                    num_points = int(random.uniform(14,18))
+                    asteroid_detail_level = int(random.uniform(14,18))
             impulse = random.uniform(1.1,1.5)
             random_angle = random.uniform(15.0,50.0)
             new_asteroid_radius = self.radius - ASTEROID_MIN_RADIUS
-            asteroid_a = Asteroid(self.position.x,self.position.y,new_asteroid_radius,num_points,random.uniform(0.05,0.20),self.spin_speed * (impulse * 2))
+            asteroid_a = Asteroid(self.position.x,self.position.y,new_asteroid_radius,asteroid_detail_level,random.uniform(0.05,0.20),self.spin_speed * (impulse * 2))
             asteroid_a.velocity = (self.velocity.rotate(random_angle)) * impulse
-            asteroid_b = Asteroid(self.position.x,self.position.y,new_asteroid_radius,num_points,random.uniform(0.05,0.20),self.spin_speed * (impulse * 2))
+            asteroid_b = Asteroid(self.position.x,self.position.y,new_asteroid_radius,asteroid_detail_level,random.uniform(0.05,0.20),self.spin_speed * (impulse * 2))
             asteroid_b.velocity = (self.velocity.rotate(-random_angle)) * impulse
-            return math.floor(self.velocity.length() / kind)
+            return points
