@@ -39,7 +39,7 @@ class PowerUp(CircleShape):
             (self.position.x - half, self.position.y + half//3), # Bottom left
             (self.position.x - half, self.position.y - half//3), # Top left
         ]
-        pygame.draw.polygon(screen, "purple", points)
+        pygame.draw.polygon(screen, COLOR_SHIELD, points)
 
     def draw(self, screen):
         self.draw_shield(screen)

@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 from circleshape import *
 from constants import *
 from shot import *
@@ -17,6 +18,7 @@ class Player(CircleShape):
         self.image = pygame.Surface((self.radius * 2, self.radius * 2))
         self.image.set_colorkey((0, 0, 0))  # Make black transparent
         self.rect = self.image.get_rect(center=(x, y))
+        self.font_score = pygame.font.Font(None, 64)
         self.font = pygame.font.Font(None, 32)
 
 
@@ -31,17 +33,22 @@ class Player(CircleShape):
     def draw(self, screen):
         if self.muzzle_flash_timer > 0.0:
             for flash_angle in self.muzzle_flash_direction:
-                direction = pygame.Vector2(0,1).rotate(flash_angle)
-                flash_end = self.triangle()[0] + direction * 16
-                pygame.draw.line(screen,"white",self.triangle()[0],flash_end,1)
+                direction = pygame.Vector2(0,1).rotate(flash_angle + random.uniform(-10,10))
+                flash_end = self.triangle()[0] + direction * random.uniform(8,16)
+                pygame.draw.line(screen,COLOR_SHOT,self.triangle()[0],flash_end,1)
         if self.shield_timer > 0:
-            pygame.draw.circle(screen,"purple",self.position,self.radius+4,3)
-            pygame.draw.polygon(screen,"darkgray",self.triangle(),2)
+            pygame.draw.circle(screen,COLOR_SHIELD,self.position,self.radius * 1.5,3)
+            pygame.draw.polygon(screen,COLOR_PLAYER,self.triangle(),2)
         else:
-            pygame.draw.polygon(screen,"white",self.triangle(),2)
-        score_text = self.font.render(f"{self.score}", True, "darkgray")
+            pygame.draw.polygon(screen,COLOR_PLAYER,self.triangle(),2)
+        score_text = self.font_score.render(f"{self.score}", True, COLOR_UI)
         score_area = score_text.get_rect(midtop=(screen.get_size()[0] // 2,10))
-        lives_text = self.font.render(f"Lives: {self.lives}", True, "darkgray")
+        if self.lives > 1:
+            lives_text = self.font.render(f"{self.lives} SHIPS LEFT // TIME: {int(self.timer)}s", True, COLOR_UI)
+        elif self.lives == 1:
+            lives_text = self.font.render(f"{self.lives} SHIP LEFT // TIME: {int(self.timer)}s", True, COLOR_UI)
+        else:
+            lives_text = self.font.render(f"LAST SHIP // TIME: {int(self.timer)}s", True, COLOR_UI)
         lives_area = lives_text.get_rect(midbottom=(screen.get_size()[0] // 2, screen.get_size()[1] - 10))
         screen.blit(score_text,(score_area))
         screen.blit(lives_text,(lives_area))
@@ -80,6 +87,8 @@ class Player(CircleShape):
 
         if self.shield_timer > 0:
             self.shield_timer -= dt
+        elif self.shield_timer <= 0:
+            self.shield_timer = 0.0
         self.rect.center = self.position
         self.muzzle_flash_direction = [self.rotation - 45,self.rotation - 30,self.rotation + 30, self.rotation + 45]
         self.shot_timer -= dt
@@ -97,7 +106,7 @@ class Player(CircleShape):
 
     def die(self):
         if self.lives >= 1:
-            self.shield_timer = 2
+            self.shield_timer = 3
             self.lives -= 1
         else:
             print(f"===== Game over! =====")

@@ -53,7 +53,7 @@ def main():
             if powerup.collision_check(player):
                 match powerup.type:
                     case "Shield":
-                        player.shield_timer = 3
+                        player.shield_timer += 3
                 powerup.kill()
         for item in group_drawable:
             item.draw(screen)

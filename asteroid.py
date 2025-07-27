@@ -27,7 +27,7 @@ class Asteroid(CircleShape):
             x_rotation = x_offset * math.cos(rad_rotation) - y_offset * math.sin(rad_rotation)
             y_rotation = x_offset * math.sin(rad_rotation) + y_offset * math.cos(rad_rotation)
             points.append((self.position.x + x_rotation, self.position.y + y_rotation))
-        pygame.draw.polygon(screen, "white", points, 2)
+        pygame.draw.polygon(screen, COLOR_ASTEROID, points, 2)
 
     def update(self, dt):
         self.position += self.velocity * dt
@@ -44,13 +44,14 @@ class Asteroid(CircleShape):
     def split(self):
         self.kill()
         kind = int(self.radius // ASTEROID_MIN_RADIUS)
-        points = math.floor(self.velocity.length() / kind)
+        magnitude = self.velocity.magnitude() / kind
+        points = math.floor(magnitude)
         num_fragments = random.randint(8,16) * kind
         for _ in range(num_fragments):
-            direction = pygame.Vector2(1,0).rotate(self.velocity.as_polar()[1] + random.uniform(-45,45))
+            direction = pygame.Vector2(1,0).rotate(self.velocity.as_polar()[1] + random.uniform(random.uniform(-45,-60),random.uniform(45,60)))
             life = random.uniform(0.1,0.5)
             spawn_position = self.position + direction * self.radius
-            Fragment(spawn_position,direction,(self.velocity.magnitude() * kind) * random.uniform(0.8,1.2),life)
+            Fragment(spawn_position,direction,(self.radius + magnitude) * random.uniform(0.75,1.1),life)
 
         if kind == 1:
             if points >= 100 and random.uniform(0.0,1.0) >= 0.75:

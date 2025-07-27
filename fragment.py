@@ -1,4 +1,5 @@
 import pygame
+from constants import COLOR_ASTEROID
 
 class Fragment(pygame.sprite.Sprite):
     def __init__(self, position, direction, length, lifetime):
@@ -34,4 +35,4 @@ class Fragment(pygame.sprite.Sprite):
             shrinkage = 2 * (1 - self.age)
             end_point = self.position + self.direction * self.length
             start_point = self.position + self.direction * self.length * (1 - shrinkage)
-        pygame.draw.line(screen, "dimgrey", start_point, end_point, 1)
+        pygame.draw.line(screen, COLOR_ASTEROID, start_point, end_point, 1)
