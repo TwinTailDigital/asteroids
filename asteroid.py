@@ -55,7 +55,7 @@ class Asteroid(CircleShape):
         if kind == 1:
             if points >= 100 and random.uniform(0.0,1.0) >= 0.75:
                 PowerUp(self.position,pygame.Vector2(1,0).rotate(self.velocity.as_polar()[1] + random.uniform(-45,45)),self.velocity)
-            return points
+            return points, kind
         else:
             asteroid_detail_level = 0
             match(kind):
@@ -70,4 +70,4 @@ class Asteroid(CircleShape):
             asteroid_a.velocity = (self.velocity.rotate(random_angle)) * impulse
             asteroid_b = Asteroid(self.position.x,self.position.y,new_asteroid_radius,asteroid_detail_level,random.uniform(0.05,0.20),self.spin_speed * (impulse * 2))
             asteroid_b.velocity = (self.velocity.rotate(-random_angle)) * impulse
-            return points
+            return points, kind

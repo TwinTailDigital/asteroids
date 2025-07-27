@@ -29,6 +29,7 @@ def main():
     print("Starting Asteroids!")
     run = True
     while run:
+        asteroid_field.spawn_count_max = ASTEROID_SPAWN_COUNT_MULTIPLIER * (round(player.timer / 30) + 1)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -41,9 +42,13 @@ def main():
             for bullet in group_shots:
                 if asteroid.collision_check(bullet):
                     bullet.kill()
-                    points = asteroid.split() # Returns points based on the kind of asteroid destroyed and how fast it was going
+                    points, kind = asteroid.split() # Returns points based on the kind of asteroid destroyed and how fast it was going
                     distance = math.floor(player.position.distance_to(asteroid.position))
                     player.add_score(points + max(0, MAX_BONUS - distance))
+                    if kind > 1:
+                        asteroid_field.spawn_count += 1
+                    else:
+                        asteroid_field.spawn_count -= 1
         for powerup in group_powerups:
             if powerup.collision_check(player):
                 match powerup.type:
@@ -53,7 +58,6 @@ def main():
         for item in group_drawable:
             item.draw(screen)
         pygame.display.flip()
-
         dt = game_clock.tick(60) / 1000
 
 
