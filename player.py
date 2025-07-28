@@ -10,6 +10,9 @@ class Player(CircleShape):
         super().__init__(x,y,PLAYER_RADIUS)
         self.timer = 0.0
         self.shot_timer = 0.0
+        self.shot_powerup_time = 0.0
+        self.shot_fast = False
+        self.shot_big = False
         self.shield_timer = 0.0
         self.score = 0
         self.lives = 3
@@ -71,7 +74,18 @@ class Player(CircleShape):
         if keys[pygame.K_SPACE]:
             if not self.shot_timer > 0.0:
                 self.shoot()
-                self.shot_timer = SHOT_RATE
+                if self.shot_powerup_time > 0.0 and self.shot_fast:
+                    self.shot_timer = SHOT_RATE * SHOT_RATE
+                else:
+                    self.shot_timer = SHOT_RATE
+        
+        if self.shot_powerup_time > 0.0:
+            self.shot_powerup_time -= dt
+        elif self.shot_powerup_time <= 0.0 and self.shot_big:
+            self.shot_big = False
+        elif self.shot_powerup_time <= 0.0 and self.shot_fast:
+            self.shot_fast = False
+
         
         self.position += self.velocity * dt
         self.velocity *= (1 - PLAYER_DRAG * dt)
@@ -97,7 +111,10 @@ class Player(CircleShape):
     
     def shoot(self):
         spawn_point = self.triangle()[0]
-        shot = Shot(spawn_point.x,spawn_point.y)
+        if self.shot_big:
+            shot = Shot(spawn_point.x,spawn_point.y,SHOT_RADIUS * 2)
+        else:
+            shot = Shot(spawn_point.x,spawn_point.y,SHOT_RADIUS)
         shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * SHOT_SPEED
         self.muzzle_flash_timer = 0.1
 

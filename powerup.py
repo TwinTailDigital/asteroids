@@ -6,7 +6,7 @@ from circleshape import *
 class PowerUp(CircleShape):
     def __init__(self, position, direction, velocity):
         super().__init__(position.x, position.y, ASTEROID_MIN_RADIUS)
-        self.type = random.choice(["Shield"])
+        self.type = random.choice(["Shield", "Fire Rate", "Big Shot"])
         self.position = position
         self.direction = direction
         self.velocity = velocity
@@ -26,11 +26,38 @@ class PowerUp(CircleShape):
         elif self.position.y < (0 - self.radius):
             self.wrap_count += 1
             self.position.y = SCREEN_HEIGHT + self.radius
-        if self.wrap_count == 3:
+        if self.wrap_count == 5:
             self.kill()
 
+    def draw_fire_rate(self, screen):
+        half = ASTEROID_MIN_RADIUS // 2
+        bullet_width = half * 0.9
+        bullet_height = half * 0.3
+        
+        for i in range(3):
+            y_offset = (i - 1) * (bullet_height + 2) 
+            points = [
+                (self.position.x + bullet_width, self.position.y + y_offset),
+                (self.position.x + bullet_width//2, self.position.y + y_offset - bullet_height//2),
+                (self.position.x - bullet_width, self.position.y + y_offset - bullet_height//2),
+                (self.position.x - bullet_width, self.position.y + y_offset + bullet_height//2),
+                (self.position.x + bullet_width//2, self.position.y + y_offset + bullet_height//2),
+            ]
+            pygame.draw.polygon(screen, COLOR_SHOT, points)
+
+    def draw_big_shot(self,screen):
+        half = ASTEROID_MIN_RADIUS // 2
+        points = [
+            (self.position.x, self.position.y - half),
+            (self.position.x + half//3, self.position.y - half//3),
+            (self.position.x + half//3, self.position.y + half),
+            (self.position.x - half//3, self.position.y + half),
+            (self.position.x - half//3, self.position.y - half//3),
+        ]
+        pygame.draw.polygon(screen, COLOR_SHOT, points)
+
     def draw_shield(self, screen):
-        half = 20 // 2
+        half = ASTEROID_MIN_RADIUS // 2
         points = [
             (self.position.x, self.position.y - half),           # Top
             (self.position.x + half, self.position.y - half//3), # Top right
@@ -42,4 +69,10 @@ class PowerUp(CircleShape):
         pygame.draw.polygon(screen, COLOR_SHIELD, points)
 
     def draw(self, screen):
-        self.draw_shield(screen)
+        match self.type:
+            case "Shield":
+                self.draw_shield(screen)
+            case "Fire Rate":
+                self.draw_fire_rate(screen)
+            case "Big Shot":
+                self.draw_big_shot(screen)

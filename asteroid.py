@@ -54,7 +54,7 @@ class Asteroid(CircleShape):
             Fragment(spawn_position,direction,(self.radius + magnitude) * random.uniform(0.75,1.1),life)
 
         if kind == 1:
-            if points >= 100 and random.uniform(0.0,1.0) >= 0.75:
+            if points >= 125 and random.uniform(0.0,1.0) >= 0.69:
                 PowerUp(self.position,pygame.Vector2(1,0).rotate(self.velocity.as_polar()[1] + random.uniform(-45,45)),self.velocity)
             return points, kind
         else:

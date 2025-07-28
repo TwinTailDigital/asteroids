@@ -51,9 +51,16 @@ def main():
                         asteroid_field.spawn_count -= 1
         for powerup in group_powerups:
             if powerup.collision_check(player):
+                player.add_score(MAX_BONUS)
                 match powerup.type:
                     case "Shield":
-                        player.shield_timer += 3
+                        player.shield_timer += POWERUP_TIME_SHIELD
+                    case "Fire Rate":
+                        player.shot_powerup_time += POWERUP_TIME_SHOT
+                        player.shot_fast = True
+                    case "Big Shot":
+                        player.shot_powerup_time += POWERUP_TIME_SHOT
+                        player.shot_big = True
                 powerup.kill()
         for item in group_drawable:
             item.draw(screen)
